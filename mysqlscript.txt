@@ -1,0 +1,5 @@
+create database octave;
+use octave;
+
+create table users(id tinyint(1) not null primary key, login char(20) not null, password char(20) not null, privileges tinyint(1));
+insert into users values(0, 'admin', 'admin', 1);
