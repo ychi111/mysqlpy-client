@@ -13,9 +13,10 @@ class win(object):
     buttons - словарь всех созданных кнопок
     txtboxes - словарь всех созданных полей для ввода
     """
-    def __init__(self, size):
+    def __init__(self, title, size):
         self.size = size
         self.root = tk.Tk()
+        self.root.title = title
         self.root.geometry(self.size)
         self.root.resizable(False, False)
         self.buttons = {}
@@ -48,16 +49,21 @@ class win(object):
     def ShowTxtBoxes(self):
         print(self.txtboxes)
 
-#Windows
+#Windows:
 
 def RegWindow():
     global Ins
-    try:
-        windows[0].Destroy()
-    except:
-        pass
+    lastx = 0
+    lasty = 0
+    for i in range(len(windows)):
+        try:
+            lastx = windows[i].root.winfo_x()
+            lasty = windows[i].root.winfo_y()
+            windows[i].Destroy()
+        except:
+            pass
 
-    reg = win("256x168")
+    reg = win("Registration", "256x168" + "+" + str(lastx) + "+" + str(lasty))
 
     reg.LableCreate("Registration")
     reg.LableCreate("Login: ")
@@ -74,18 +80,28 @@ def RegWindow():
 
 
 def AutWindow():
-    try:
-        windows[1].Destroy()
-    except:
-        pass
-    aut = win("256x168")
+    lastx = 0 
+    lasty = 0
+    for i in range(len(windows)):
+        try:
+            lastx = windows[i].root.winfo_x()
+            lasty = windows[i].root.winfo_y()
+            windows[i].Destroy()
+        except:
+            pass
+
+    aut = win("Authorisatin", "256x180" + "+" + str(lastx) + "+" + str(lasty))
+
     aut.LableCreate("Authorisation")
     aut.LableCreate("Login: ")
     aut.TxtCreate("loginbox")
     aut.LableCreate("Password: ")
     aut.TxtCreate("passbox")
+
+    aut.BtnCreate("ok", "print(\"\")", "OK")
     aut.BtnCreate("toregister", "RegWindow", "Not registered yet? Click here!")
     aut.BtnCreate("quit", "self.root.destroy", "Quit")
+
     windows.append(aut)
     aut.MainLoop()
 
