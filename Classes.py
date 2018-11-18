@@ -3,14 +3,15 @@ import pymysql
 
 class connection(object):
     def __init__(self):
-        self.connection = pymysql.connect(host='localhost',
-                                     user='root',
-                                     password='1234',
-                                     db='Octave',
-                                     charset='utf8mb4',
-                                     cursorclass=pymysql.cursors.DictCursor)
-
-        print("connect successful!!")
+        try:
+            self.connection = pymysql.connect(host='localhost',
+                                         user='root',
+                                         password='1234',
+                                         db='Octave',
+                                         charset='utf8mb4',
+                                         cursorclass=pymysql.cursors.DictCursor)
+        except:
+            print("Connection failed!")
     def SelectCommand(self, text):
         self.text = text
         try:

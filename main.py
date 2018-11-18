@@ -2,23 +2,16 @@ from Classes import *
 import tkinter as tk
 
 
-Ins = 0
-idcount = 0
-windows = []
+Temp = 0
 
 
-class win(object):
+class Win(object):
     """
     Класс для создания простого окна
     buttons - словарь всех созданных кнопок
     txtboxes - словарь всех созданных полей для ввода
     """
-    def __init__(self, title, size):
-        self.size = size
-        self.root = tk.Tk()
-        self.root.title = title
-        self.root.geometry(self.size)
-        self.root.resizable(False, False)
+    def __init__(self):
         self.buttons = {}
         self.txtboxes = {}
 
@@ -43,67 +36,73 @@ class win(object):
     def Destroy(self):
         self.root.destroy()
 
-    def ShowButtons(self):
-        #for i in self.buttons:
-        print(self.buttons)
-    def ShowTxtBoxes(self):
-        print(self.txtboxes)
+class AutWindow(Win):
 
-#Windows:
+    def build(self, x = 100, y = 100):
+        self.root = tk.Tk()
+        self.root.size = "256x180" + "+" + str(x) + "+" + str(y)
+        self.root.title = "Authorisation"
+        self.root.geometry(self.root.size)
+        self.root.resizable(False, False)
+        self.LableCreate("Authorisation")
+        self.LableCreate("Login: ")
+        self.TxtCreate("loginbox")
+        self.LableCreate("Password: ")
+        self.TxtCreate("passbox")
+        self.BtnCreate("ok", "self.AutCheck", "OK")
+        self.BtnCreate("toregister", "self.switch_window", "Not registered yet? Click here!")
+        self.BtnCreate("quit", "self.Destroy", "Quit")
+        self.MainLoop()
 
-def RegWindow():
-    global Ins
-    lastx = 0
-    lasty = 0
-    for i in range(len(windows)):
-        try:
-            lastx = windows[i].root.winfo_x()
-            lasty = windows[i].root.winfo_y()
-            windows[i].Destroy()
-        except:
-            pass
+    def switch_window(self):
+        x = self.root.winfo_x()
+        y = self.root.winfo_y()
+        self.Destroy()
+        windows["RegWindow"].build(x, y)
 
-    reg = win("Registration", "256x168" + "+" + str(lastx) + "+" + str(lasty))
+    def AutCheck(self):
+        log = windows["AutWindow"].txtboxes["loginbox"].get()
+        passw = windows["AutWindow"].txtboxes["passbox"].get()
+        db = connection()
+        if (log!="" and passw!=""):
+            privileges = db.SelectCommand("SELECT privileges FROM users WHERE (login = \""+log+"\" and password = \""+passw+"\")")
+        else:
+            print('login or password box is empty!')
+        db.CloseConnection()
+        print(privileges[0]["privileges"])
 
-    reg.LableCreate("Registration")
-    reg.LableCreate("Login: ")
-    reg.TxtCreate("loginbox")
-    reg.LableCreate("Password: ")
-    reg.TxtCreate("passbox")
-    Ins = LazyCall(RegisterInsert, 1)
+class RegWindow(Win):
 
-    reg.BtnCreate("makereg", "Ins", "OK")
-    reg.BtnCreate("back", "AutWindow", "Back")
+    def build(self, x = 100, y = 100):
+        self.root = tk.Tk()
+        self.root.size = "256x168" + "+" + str(x) + "+" + str(y)
+        self.root.title = "Registration"
+        self.root.geometry(self.root.size)
+        self.root.resizable(False, False)
+        self.LableCreate("Registration")
+        self.LableCreate("Login: ")
+        self.TxtCreate("loginbox")
+        self.LableCreate("Password: ")
+        self.TxtCreate("passbox")
+        self.BtnCreate("makereg", "self.RegInsert", "OK")
+        self.BtnCreate("back", "self.switch_window", "Back")
+        self.MainLoop()
 
-    windows.append(reg)
-    reg.MainLoop()
+    def switch_window(self):
+        x = self.root.winfo_x()
+        y = self.root.winfo_y()
+        self.Destroy()
+        windows["AutWindow"].build(x, y)
 
-
-def AutWindow():
-    lastx = 0 
-    lasty = 0
-    for i in range(len(windows)):
-        try:
-            lastx = windows[i].root.winfo_x()
-            lasty = windows[i].root.winfo_y()
-            windows[i].Destroy()
-        except:
-            pass
-
-    aut = win("Authorisatin", "256x180" + "+" + str(lastx) + "+" + str(lasty))
-
-    aut.LableCreate("Authorisation")
-    aut.LableCreate("Login: ")
-    aut.TxtCreate("loginbox")
-    aut.LableCreate("Password: ")
-    aut.TxtCreate("passbox")
-
-    aut.BtnCreate("ok", "print(\"\")", "OK")
-    aut.BtnCreate("toregister", "RegWindow", "Not registered yet? Click here!")
-    aut.BtnCreate("quit", "self.root.destroy", "Quit")
-
-    windows.append(aut)
-    aut.MainLoop()
+    def RegInsert(self):
+        log = windows["RegWindow"].txtboxes["loginbox"].get()
+        passw = windows["RegWindow"].txtboxes["passbox"].get()
+        db = connection()
+        if (log!="" and passw!=""):
+            db.InsertCommand("INSERT INTO users VALUES ("+str(MaxIdCounter())+", \'"+log+"\', \'"+passw+"\', 0)")
+        else:
+            print('login or password box is empty!')
+        db.CloseConnection()
 
 #SQL FUNCTIONS:
 
@@ -113,19 +112,22 @@ def Select():
     db.CloseConnection()
 
 
-def RegisterInsert(i):
-    log = windows[i].txtboxes["loginbox"].get()
-    passw = windows[i].txtboxes["passbox"].get()
-    db = connection()
-    db.InsertCommand("INSERT INTO users VALUES ("+str(MaxIdCounter())+", \'"+log+"\', \'"+passw+"\', 0)")
-    db.CloseConnection()
-
 def MaxIdCounter():
     db = connection()
     idcount = db.SelectCommand("SELECT MAX(id) from users")
     db.CloseConnection()
-    return idcount[0]["MAX(id)"]
+    return (idcount[0]["MAX(id)"] + 1)
+###############################################
 
 #Start
 if __name__ == "__main__":
-    AutWindow()
+
+    windows = {}
+
+    AutWindow = AutWindow()
+    RegWindow = RegWindow()
+
+    windows["AutWindow"] = AutWindow
+    windows["RegWindow"] = RegWindow
+
+    AutWindow.build()
