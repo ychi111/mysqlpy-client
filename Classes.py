@@ -27,6 +27,7 @@ class connection(object):
                 return (retrow)
         except:
             print("Command Error!")
+            
     def CloseConnection(self):
         self.connection.close()
 
