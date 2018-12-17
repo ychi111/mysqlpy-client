@@ -45,35 +45,3 @@ class connection(object):
             print("Command Error!")
     def CloseConnection(self):
         self.connection.close()
-
-class LazyCall(object):
-    """
-        Класс создаёт ленивые функции
-        То-есть при инициализации передаёте
-        функцию и её параметры
-        Функция не выполняется, а полученный объект
-        можно будет потом вызвать как переданную
-        функцию с переданными параметрами
-
-        HOW_TO:
-         def say_hi(someone):
-            print("Hi, " + someone + "!")
-         HiGosha = LazyCall(say_hi, "Gosha")
-         HiGosha()
-         "Hi, Gosha"
-    """
-    def __init__(self, func, *args, **kwargs):
-        self.f = func
-        self.a = args
-        self.ka = kwargs
-    def __call__(self):
-        return self.f(*self.a, **self.ka)
-
-#Можно сразу передавать параметры в функцию при её создании
-#Удобно, если функция передаётся сразу в button
-
-#Это декоратор, если чо
-def lazy_callable(*args, **kwargs):
-    def dec(func):
-        return LazyCall(func, *args, **kwargs)
-    return dec
