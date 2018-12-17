@@ -1,9 +1,5 @@
-from classes import *
+from requests import *
 import tkinter as tk
-import socket
-
-
-Temp = 0
 
 
 class Win(object):
@@ -154,54 +150,27 @@ class RegWindow(Win):
         log = windows["RegWindow"].txtboxes["loginbox"].get()
         passw1 = windows["RegWindow"].txtboxes["passbox1"].get()
         passw2 = windows["RegWindow"].txtboxes["passbox2"].get()
-        if (passw1 == passw2 and log and passw1):
-            sock = socket.socket()
-            sock.connect(('localhost', 9090))
-            sock.send(log.encode("utf-8") + ",".encode("utf-8") + passw1.encode("utf-8"))
-            sock.close()
-            windows["RegWindow"].labels["error"].config(text = "You are successfully registered!")
-        else:
-            windows["RegWindow"].labels["error"].config(text = "Passwords are not equal!")
-        """
         if (passw1 == passw2):
-            db = connection()
             if (log!="" and passw1!=""):
-                db.InsertCommand("INSERT INTO users VALUES ("+str(MaxIdCounter())+", \'"+log+"\', \'"+passw1+"\', 0)")
+                reg_insert(log, passw1)
             else:
                 print('login or password box is empty!')
-            db.CloseConnection()
         else:
             windows["RegWindow"].labels["error"].config(text = "Passwords are not equal!")
-        """
 
 
-#SQL FUNCTIONS:
-
-def Select():
-    db = connection()
-    db.SelectCommand("SELECT * FROM users")
-    db.CloseConnection()
-
-
-def MaxIdCounter():
-    db = connection()
-    idcount = db.SelectCommand("SELECT MAX(id) from users")
-    db.CloseConnection()
-    return (idcount[0]["MAX(id)"] + 1)
 
 #Start
-if __name__ == "__main__":
+windows = {}
 
-    windows = {}
+AutWindow = AutWindow()
+RegWindow = RegWindow()
+AdminWindow = AdminWindow()
+UserWindow = UserWindow()
 
-    AutWindow = AutWindow()
-    RegWindow = RegWindow()
-    AdminWindow = AdminWindow()
-    UserWindow = UserWindow()
+windows["AutWindow"] = AutWindow
+windows["RegWindow"] = RegWindow
+windows["AdminWindow"] = AdminWindow
+windows["UserWindow"] = UserWindow
 
-    windows["AutWindow"] = AutWindow
-    windows["RegWindow"] = RegWindow
-    windows["AdminWindow"] = AdminWindow
-    windows["UserWindow"] = UserWindow
-
-    AutWindow.build()
+AutWindow.build()
