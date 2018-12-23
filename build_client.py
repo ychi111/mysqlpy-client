@@ -1,4 +1,4 @@
-from client import *
+from GUI import *
 
 
 AutWindow = AutWindow()
